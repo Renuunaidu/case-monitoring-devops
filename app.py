@@ -1,82 +1,48 @@
 from flask import Flask, render_template
+import pandas as pd
 
 app = Flask(__name__)
 
-cases = [
-    {
-        "case": "CS00111",
-        "priority": "P1",
-        "status": "Open",
-        "escalated": "No",
-        "acknowledged": "No",
-        "followup": "04-10-2026 16:00"
-    },
-    {
-        "case": "CS00112",
-        "priority": "P1",
-        "status": "Open",
-        "escalated": "No",
-        "acknowledged": "No",
-        "followup": "04-10-2026 17:00"
-    },
-    {
-        "case": "CS00113",
-        "priority": "P2",
-        "status": "Resolved",
-        "escalated": "No",
-        "acknowledged": "Yes",
-        "followup": "RESOLVED"
-    },
-    {
-        "case": "CS00114",
-        "priority": "P3",
-        "status": "Open",
-        "escalated": "Yes",
-        "acknowledged": "Yes",
-        "followup": "05-10-2026 17:00"
-    },
-    {
-        "case": "CS00115",
-        "priority": "P2",
-        "status": "Open",
-        "escalated": "No",
-        "acknowledged": "Yes",
-        "followup": "05-10-2026 17:00"
-    },
-    {
-        "case": "CS00116",
-        "priority": "P3",
-        "status": "Resolved",
-        "escalated": "No",
-        "acknowledged": "Yes",
-        "followup": "RESOLVED"
-    },
-    {
-        "case": "CS00117",
-        "priority": "P1",
-        "status": "Open",
-        "escalated": "Yes",
-        "acknowledged": "No",
-        "followup": "04-10-2026 19:00"
-    },
-    {
-        "case": "CS00118",
-        "priority": "P3",
-        "status": "Open",
-        "escalated": "Yes",
-        "acknowledged": "No",
-        "followup": "04-10-2026 19:00"
-    }
-]
+
+def load_cases():
+    df = pd.read_excel("cases.xlsx")
+
+    cases = []
+
+    for _, row in df.iterrows():
+        cases.append({
+            "case": str(row["Case Number"]),
+            "priority": str(row["Priority"]),
+            "status": str(row["Status"]),
+            "escalated": str(row["Escalated"]),
+            "acknowledged": str(row["Acknowledged"]),
+            "followup": str(row["Next followp date & time"])
+        })
+
+    return cases
 
 
 @app.route("/")
 def dashboard():
 
+    cases = load_cases()
+
     total = len(cases)
-    open_cases = sum(1 for case in cases if case["status"] == "Open")
-    resolved_cases = sum(1 for case in cases if case["status"] == "Resolved")
-    escalated_cases = sum(1 for case in cases if case["escalated"] == "Yes")
+
+    open_cases = sum(
+        1 for case in cases
+        if case["status"] == "Open"
+    )
+
+    resolved_cases = sum(
+        1 for case in cases
+        if case["status"] == "Resolved"
+    )
+
+    escalated_cases = sum(
+        1 for case in cases
+        if case["escalated"] == "Yes"
+    )
 
     priority_counts = {
         "P1": sum(1 for case in cases if case["priority"] == "P1"),
