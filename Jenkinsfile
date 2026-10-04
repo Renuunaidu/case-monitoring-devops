@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -18,8 +19,11 @@ pipeline {
                         passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
+
                     bat 'docker tag case-monitoring:latest %DOCKER_USERNAME%/case-monitoring:latest'
-                    bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
+
+                    bat 'powershell -NoProfile -Command "$env:DOCKER_PASSWORD | docker login -u $env:DOCKER_USERNAME --password-stdin"'
+
                     bat 'docker push %DOCKER_USERNAME%/case-monitoring:latest'
                 }
             }
@@ -27,3 +31,4 @@ pipeline {
 
     }
 }
+```
