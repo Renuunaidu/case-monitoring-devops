@@ -1,11 +1,26 @@
 from flask import Flask, render_template
 import pandas as pd
+import boto3
+import os
 
 app = Flask(__name__)
 
+S3_BUCKET = "renuka-case-monitoring-data-2026-226147735303-us-east-1-an"
+S3_FILE = "cases.xlsx"
+LOCAL_FILE = "/tmp/cases.xlsx"
+
 
 def load_cases():
-    df = pd.read_excel("cases.xlsx")
+
+    s3 = boto3.client("s3")
+
+    s3.download_file(
+        S3_BUCKET,
+        S3_FILE,
+        LOCAL_FILE
+    )
+
+    df = pd.read_excel(LOCAL_FILE)
 
     cases = []
 
