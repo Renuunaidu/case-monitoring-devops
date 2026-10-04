@@ -19,7 +19,7 @@ pipeline {
                     )
                 ]) {
                     bat 'docker tag case-monitoring:latest %DOCKER_USERNAME%/case-monitoring:latest'
-                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                    bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
                     bat 'docker push %DOCKER_USERNAME%/case-monitoring:latest'
                 }
             }
