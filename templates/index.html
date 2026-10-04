@@ -180,6 +180,7 @@
 
     <meta http-equiv="refresh" content="30">
 </head>
+
 <body>
 
     <div class="header">
@@ -189,7 +190,7 @@
 
     <div class="container">
 
-        <!-- Main Metrics -->
+        <!-- Case Summary -->
 
         <h2 class="section-title">Case Summary</h2>
 
@@ -262,6 +263,7 @@
                 <div class="critical-case">
 
                     <div>
+
                         <div class="case-number">
                             {{ case["case"] }}
                         </div>
@@ -273,6 +275,7 @@
                             &nbsp; | &nbsp;
                             Acknowledged: {{ case["acknowledged"] }}
                         </div>
+
                     </div>
 
                     <div>
@@ -301,6 +304,7 @@
             <table>
 
                 <thead>
+
                     <tr>
                         <th>Case Number</th>
                         <th>Priority</th>
@@ -309,6 +313,7 @@
                         <th>Acknowledged</th>
                         <th>Next Follow-up</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
@@ -318,18 +323,19 @@
                     <tr class="{% if case['escalated'] == 'Yes' and case['acknowledged'] == 'No' %}critical-row{% endif %}">
 
                         <td>{{ case["case"] }}</td>
+
                         <td>{{ case["priority"] }}</td>
 
+                        <!-- Display actual status from Excel -->
+
                         <td>
-                            {% if case["status"] == "Open" %}
-                                <span class="open">Open</span>
-                            {% else %}
-                                <span class="resolved">Resolved</span>
-                            {% endif %}
+                            {{ case["status"] }}
                         </td>
 
                         <td>{{ case["escalated"] }}</td>
+
                         <td>{{ case["acknowledged"] }}</td>
+
                         <td>{{ case["followup"] }}</td>
 
                     </tr>
