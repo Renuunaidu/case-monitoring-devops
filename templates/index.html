@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Monitoring Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 22px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .header span {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .section-title {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .number {
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .priority-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .priority {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .priority h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .priority .number {
+            font-size: 30px;
+        }
+
+        .critical-section {
+            background: #fff1f2;
+            border: 2px solid #dc2626;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 30px;
+        }
+
+        .critical-title {
+            color: #b91c1c;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .critical-case {
+            background: #dc2626;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .critical-case:last-child {
+            margin-bottom: 0;
+        }
+
+        .case-number {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .case-details {
+            font-size: 14px;
+        }
+
+        .table-section {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #374151;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .open {
+            font-weight: bold;
+        }
+
+        .resolved {
+            font-weight: bold;
+        }
+
+        .critical-row {
+            background: #fee2e2;
+        }
+
+        @media (max-width: 900px) {
+            .cards,
+            .priority-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Case Monitoring Dashboard</h1>
+        <span>Live Case Status</span>
+    </div>
+
+    <div class="container">
+
+        <!-- Main Metrics -->
+
+        <h2 class="section-title">Case Summary</h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Cases</h3>
+                <div class="number">{{ total }}</div>
+            </div>
+
+            <div class="card">
+                <h3>Open Cases</h3>
+                <div class="number">{{ open_cases }}</div>
+            </div>
+
+            <div class="card">
+                <h3>Resolved Cases</h3>
+                <div class="number">{{ resolved_cases }}</div>
+            </div>
+
+            <div class="card">
+                <h3>Escalated Cases</h3>
+                <div class="number">{{ escalated_cases }}</div>
+            </div>
+
+        </div>
+
+
+        <!-- Priority Summary -->
+
+        <h2 class="section-title">Priority Summary</h2>
+
+        <div class="priority-cards">
+
+            <div class="priority">
+                <h3>P1</h3>
+                <div class="number">{{ priority_counts["P1"] }}</div>
+            </div>
+
+            <div class="priority">
+                <h3>P2</h3>
+                <div class="number">{{ priority_counts["P2"] }}</div>
+            </div>
+
+            <div class="priority">
+                <h3>P3</h3>
+                <div class="number">{{ priority_counts["P3"] }}</div>
+            </div>
+
+            <div class="priority">
+                <h3>P4</h3>
+                <div class="number">{{ priority_counts["P4"] }}</div>
+            </div>
+
+        </div>
+
+
+        <!-- Critical Cases -->
+
+        <div class="critical-section">
+
+            <div class="critical-title">
+                🚨 CRITICAL / ACTION REQUIRED
+            </div>
+
+            {% if critical_cases %}
+
+                {% for case in critical_cases %}
+
+                <div class="critical-case">
+
+                    <div>
+                        <div class="case-number">
+                            {{ case["case"] }}
+                        </div>
+
+                        <div class="case-details">
+                            Priority: {{ case["priority"] }}
+                            &nbsp; | &nbsp;
+                            Escalated: {{ case["escalated"] }}
+                            &nbsp; | &nbsp;
+                            Acknowledged: {{ case["acknowledged"] }}
+                        </div>
+                    </div>
+
+                    <div>
+                        Follow-up: {{ case["followup"] }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No critical cases.</p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- All Cases -->
+
+        <div class="table-section">
+
+            <h2 class="section-title">All Cases</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Case Number</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Escalated</th>
+                        <th>Acknowledged</th>
+                        <th>Next Follow-up</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for case in cases %}
+
+                    <tr class="{% if case['escalated'] == 'Yes' and case['acknowledged'] == 'No' %}critical-row{% endif %}">
+
+                        <td>{{ case["case"] }}</td>
+                        <td>{{ case["priority"] }}</td>
+
+                        <td>
+                            {% if case["status"] == "Open" %}
+                                <span class="open">Open</span>
+                            {% else %}
+                                <span class="resolved">Resolved</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ case["escalated"] }}</td>
+                        <td>{{ case["acknowledged"] }}</td>
+                        <td>{{ case["followup"] }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
